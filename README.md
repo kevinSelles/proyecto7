@@ -1,8 +1,8 @@
 # Proyecto Juegos y Personajes API REST
 
 Este proyecto es un backend con JavaScript, usando librerías como Express, Mongoose y Dotenv, además de una base de datos MongoDB Atlas.
-La idea es poder crear una enciclopedia sobre la saga Assassins Creed con la colaboración de la comunidad de usuarios, que podrá añadir
-personajes a los juegos, junto con toda la información que quieran.
+Con las tres colecciones en la base de datos (usuarios, personajes y juegos). La idea es poder crear una enciclopedia sobre la saga Assassins Creed 
+con la colaboración de la comunidad de usuarios, que podrá añadir personajes a los juegos, junto con toda la información que conozcan sobre el mismo.
 
 ## Endpoints de Games
 
