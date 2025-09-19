@@ -4,7 +4,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "seed:games": "node ./src/utils/seeds/games.js",
+    "seed:characters": "node ./src/utils/seeds/characters.js"
   },
   "keywords": [],
   "author": "",
