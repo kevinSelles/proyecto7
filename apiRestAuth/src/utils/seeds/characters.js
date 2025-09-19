@@ -1,0 +1,379 @@
+require("dotenv").config();
+const { connectDB } = require("../../config/db");
+const Character = require("../../api/models/characters");
+
+const characters = [
+  {
+    name: "Altaïr Ibn-La'Ahad",
+    category: "main character",
+    game: ["Assassin's Creed", "Assassin's Creed Revelations", "Assassin's Creed: Bloodlines", "Assassin's Creed: Altair's Chronicles"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FAlta%25C3%25AFr_Ibn-La%2527Ahad&psig=AOvVaw1s2CPZsQaQiaj9kAqOj4ag&ust=1757618327690000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCOjw99T0zo8DFQAAAAAdAAAAABAX",
+    biography: "Un maestro Asesino de la Hermandad en la época de la Tercera Cruzada. Reconocido por su destreza y disciplina, marcó el camino para generaciones futuras. Su legado e ideales se extienden más allá de su propia vida."
+  },
+  {
+    name: "Al Mualim",
+    category: "secondary character",
+    game: ["Assassin's Creed"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FAl_Mualim&psig=AOvVaw1aHM6rEaJWJ92uXu4f4si_&ust=1757618429043000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCOiYtIL1zo8DFQAAAAAdAAAAABAE",
+    biography: "Mentor de la Hermandad en Masyaf y guía de Altaïr. Figura influyente en los primeros pasos de la Orden."
+  },
+  {
+    name: "Roberto de Sablé",
+    category: "secondary character",
+    game: ["Assassin's Creed"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FRoberto_de_Sable&psig=AOvVaw1R3WqdVP4s-Hu09DumBMue&ust=1757618475431000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCLjC46f1zo8DFQAAAAAdAAAAABAE",
+    biography: "Un líder templario de gran poder e influencia durante la Tercera Cruzada, enemigo directo de los Asesinos."
+  },
+  {
+    name: "Ezio Auditore da Firenze",
+    category: "main character",
+    game: ["Assassin's Creed II", "Assassin's Creed Brotherhood", "Assassin's Creed Revelations"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FEzio_Auditore_da_Firenze&psig=AOvVaw1iA7j0ELDhpvkfl50CKTIw&ust=1757618586816000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCLic0c31zo8DFQAAAAAdAAAAABAE",
+    biography: "Un joven noble florentino que, tras una tragedia, se convierte en uno de los Asesinos más célebres de la historia. Lideró la Hermandad en Italia durante el Renacimiento, expandió la influencia de los Asesinos en Roma y finalmente viajó a Constantinopla para desentrañar los secretos de Altaïr."
+  },
+  {
+    name: "Leonardo da Vinci",
+    category: "secondary character",
+    game: ["Assassin's Creed II"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FLeonardo_da_Vinci&psig=AOvVaw3OJrDllgn9y8YrLlh0pR5I&ust=1757618622954000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCNiXp9_1zo8DFQAAAAAdAAAAABAE",
+    biography: "Genio del Renacimiento que apoya a Ezio con su intelecto e inventos, aportando soluciones únicas en su lucha contra los Templarios."
+  },
+  {
+    name: "Rodrigo Borgia",
+    category: "secondary character",
+    game: ["Assassin's Creed II"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FRodrigo_Borgia&psig=AOvVaw09x63hPVR9YSAaxtGvSIy4&ust=1757618655266000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCOi52e_1zo8DFQAAAAAdAAAAABAE",
+    biography: "Un poderoso hombre de la Iglesia vinculado a los Templarios, que busca consolidar poder político y religioso."
+  },
+  {
+    name: "Claudia Auditore",
+    category: "secondary character",
+    game: ["Assassin's Creed Brotherhood"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FClaudia_Auditore_da_Firenze&psig=AOvVaw1ZyWt75sw_2zhydCeLTlIC&ust=1757618689542000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCNjk1_71zo8DFQAAAAAdAAAAABAE",
+    biography: "Hermana de Ezio. Una mujer decidida que colabora activamente en la reconstrucción y gestión de la Hermandad en Roma."
+  },
+  {
+    name: "César Borgia",
+    category: "secondary character",
+    game: ["Assassin's Creed Brotherhood"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FC%25C3%25A9sar_Borgia&psig=AOvVaw2X-7t6aigHKgNduf7QbOAD&ust=1757618724983000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCIiG6I_2zo8DFQAAAAAdAAAAABAE",
+    biography: "Ambicioso e implacable miembro de la familia Borgia que busca expandir su poder en Italia."
+  },
+  {
+    name: "Yusuf Tazim",
+    category: "secondary character",
+    game: ["Assassin's Creed Revelations"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FYusuf_Tazim&psig=AOvVaw1xFnk_5phfN1s7Xljw5470&ust=1757618792853000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCNDzqbH2zo8DFQAAAAAdAAAAABAE",
+    biography: "Líder de los Asesinos en Constantinopla. Carismático y leal, ofrece apoyo y conocimientos locales a Ezio durante su viaje."
+  },
+  {
+    name: "Ratonhnhaké:ton (Connor Kenway)",
+    category: "main character",
+    game: ["Assassin's Creed III"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FRatonhnhak%25C3%25A9%3Aton&psig=AOvVaw1CU34pc3qXlXHxYGQHR95L&ust=1757618835290000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCMi98sT2zo8DFQAAAAAdAAAAABAE",
+    biography: "Hijo de un británico y una nativa americana, se convierte en un Asesino para proteger a su pueblo y luchar en medio de la Revolución Americana. Su vida está marcada por el choque cultural y el deseo de justicia."
+  },
+  {
+    name: "Haytham Kenway",
+    category: "secondary character",
+    game: ["Assassin's Creed III"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FHaytham_Kenway&psig=AOvVaw1b8cxImbMUd6tZr7Eorwxv&ust=1757618866058000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCNCwg9P2zo8DFQAAAAAdAAAAABAE",
+    biography: "Un hombre culto y carismático, con fuertes convicciones, que desempeña un papel crucial en los acontecimientos de la Revolución Americana."
+  },
+  {
+    name: "Charles Lee",
+    category: "secondary character",
+    game: ["Assassin's Creed III"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FCharles_Lee&psig=AOvVaw2SYDPEIY0iT8Txjz50SJU2&ust=1757618900231000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCIiHueT2zo8DFQAAAAAdAAAAABAE",
+    biography: "Figura militar en la Guerra de Independencia y aliado de intereses templarios en las colonias."
+  },
+  {
+    name: "Edward Kenway",
+    category: "main character",
+    game: ["Assassin's Creed IV: Black Flag"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fwiki%2FEdward_Kenway&psig=AOvVaw0B7xpGATjFjmS9NDw5JzR1&ust=1757618941135000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCNCIzvb2zo8DFQAAAAAdAAAAABAE",
+    biography: "Un corsario galés que se convierte en pirata y, eventualmente, en Asesino. Su vida combina la ambición personal con la lucha por un propósito mayor en el Caribe del siglo XVIII."
+  },
+  {
+    name: "Bartholomew Roberts",
+    category: "secondary character",
+    game: ["Assassin's Creed IV: Black Flag"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FBartholomew_Roberts&psig=AOvVaw3UEoNBEm3YnOfqeiVI13hi&ust=1757618981497000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCPjP6In3zo8DFQAAAAAdAAAAABAE",
+    biography: "Pirata conocido por su astucia y ambición, cuyas acciones marcan profundamente el destino de Edward."
+  },
+  {
+    name: "Shay Patrick Cormac",
+    category: "main character",
+    game: ["Assassin's Creed Rogue"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fvsbattles.fandom.com%2Fwiki%2FShay_Cormac&psig=AOvVaw26GHltA__b6tXJv_MIATBY&ust=1757619021234000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCPDi7J33zo8DFQAAAAAdAAAAABAE",
+    biography: "Un irlandés que comienza su camino como Asesino pero cuyo destino lo lleva a cuestionar las decisiones de la Hermandad, cambiando el rumbo de su vida en plena Guerra de los Siete Años."
+  },
+  {
+    name: "Achilles Davenport",
+    category: "secondary character",
+    game: ["Assassin's Creed Rogue", "Assassin's Creed III"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fwiki%2FAchilles_Davenport&psig=AOvVaw3tLXBAAmXVImtMXVocSbxo&ust=1757619075184000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCODkrbf3zo8DFQAAAAAdAAAAABAK",
+    biography: "Mentor de los Asesinos en las colonias americanas, figura clave en la formación de nuevas generaciones."
+  },
+  {
+    name: "George Monro",
+    category: "secondary character",
+    game: ["Assassin's Creed Rogue"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FGeorge_Monro&psig=AOvVaw18Fq9Dg7vtHStgtfgTNFYW&ust=1757619116788000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCPCQqsr3zo8DFQAAAAAdAAAAABAE",
+    biography: "Un militar británico que establece un fuerte vínculo con Shay y ejerce gran influencia en sus decisiones."
+  },
+  {
+    name: "Arno Dorian",
+    category: "main character",
+    game: ["Assassin's Creed Unity"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FArno_Dorian&psig=AOvVaw3qNXwG89lwlkieu7iHWBSV&ust=1757619148847000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCIDvy9n3zo8DFQAAAAAdAAAAABAE",
+    biography: "Un joven que busca redención tras una tragedia personal y que encuentra en la Hermandad una causa durante la Revolución Francesa. Su historia está marcada por la tensión entre el deber y los sentimientos personales."
+  },
+  {
+    name: "Élise de la Serre",
+    category: "secondary character",
+    game: ["Assassin's Creed Unity"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fwiki%2F%25C3%2589lise_de_la_Serre&psig=AOvVaw2Pltx1oI0W59Uu-BmLfxhc&ust=1757619185540000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCMiBiOv3zo8DFQAAAAAdAAAAABAE",
+    biography: "Una mujer noble con fuertes lazos familiares y convicciones propias, cuya relación con Arno es tan profunda como conflictiva."
+  },
+  {
+    name: "François-Thomas Germain",
+    category: "secondary character",
+    game: ["Assassin's Creed Unity"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FFran%25C3%25A7ois-Thomas_Germain&psig=AOvVaw3xPqiZwEAZ8hHBlnxwzMZl&ust=1757619225501000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCIjuk_73zo8DFQAAAAAdAAAAABAE",
+    biography: "Artesano parisino vinculado a los templarios, con un papel importante en los acontecimientos de la Revolución."
+  },
+  {
+    name: "Jacob Frye",
+    category: "main character",
+    game: ["Assassin's Creed Syndicate"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FJacob_Frye&psig=AOvVaw1gtvd2ycssqNZ4wX6BBGDm&ust=1757619254903000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCMDvmoz4zo8DFQAAAAAdAAAAABAW",
+    biography: "Hermano gemelo de Evie Frye y Asesino en el Londres victoriano. Lidera la Hermandad contra la opresión y la corrupción en la ciudad industrial."
+  },
+  {
+    name: "Evie Frye",
+    category: "main character",
+    game: ["Assassin's Creed Syndicate"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FEvie_Frye&psig=AOvVaw2U_NeFh8Wn-TpuN_Zz8a-a&ust=1757619409302000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCIj42NX4zo8DFQAAAAAdAAAAABAE",
+    biography: "Hermana gemela de Jacob. Maestra en sigilo y planificación estratégica, complementa a su hermano en la lucha contra los templarios."
+  },
+  {
+    name: "Crawford Starrick",
+    category: "secondary character",
+    game: ["Assassin's Creed Syndicate"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FCrawford_Starrick&psig=AOvVaw0wPmKArZuI_r8BldglxDk7&ust=1757619442442000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCIDH1eX4zo8DFQAAAAAdAAAAABAE",
+    biography: "Principal antagonista del juego. Líder templario que controla gran parte de Londres y representa la corrupción de la época."
+  },
+  {
+    name: "Bayek de Siwa",
+    category: "main character",
+    game: ["Assassin's Creed Origins"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FBayek_de_Siwa&psig=AOvVaw2g4XrrI_IeMHUIeXP19Pfj&ust=1757619469049000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCKiTrfL4zo8DFQAAAAAdAAAAABAE",
+    biography: "Medjay de la antigua Egipto y protector de su gente. Su historia marca el nacimiento de la Hermandad de Asesinos en Egipto."
+  },
+  {
+    name: "Aya",
+    category: "secondary character",
+    game: ["Assassin's Creed Origins"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fhero.fandom.com%2Fwiki%2FAya_%2528Assassin%2527s_Creed%2529&psig=AOvVaw0iteCnwWSelHD9QLuWedGL&ust=1757619497364000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCKjY7P_4zo8DFQAAAAAdAAAAABAE",
+    biography: "Compañera de Bayek, decidida y con un fuerte sentido de justicia. Contribuye activamente a la fundación de la Hermandad."
+  },
+  {
+    name: "Ptolomeo XIII",
+    category: "secondary character",
+    game: ["Assassin's Creed Origins"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FPtolomeo_XIII&psig=AOvVaw3FW6N51ziN7HIwecylvIzL&ust=1757619532195000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCKDDs5D5zo8DFQAAAAAdAAAAABAE",
+    biography: "Faraón de Egipto durante el periodo de Bayek. Su gobierno y decisiones afectan directamente el desarrollo de los eventos históricos."
+  },
+  {
+    name: "Alexios",
+    category: "main character",
+    game: ["Assassin's Creed Odyssey"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FAlexios&psig=AOvVaw2jYfsYQ1xbuX4RW86TqH5R&ust=1757619557396000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCKDLtpz5zo8DFQAAAAAdAAAAABAW",
+    biography: "Un mercenario espartano que descubre secretos de su familia y se ve envuelto en el conflicto entre civilizaciones en la Grecia clásica. Puede elegirse como protagonista, también existe la opción de Kassandra."
+  },
+  {
+    name: "Kassandra",
+    category: "main character",
+    game: ["Assassin's Creed Odyssey"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FKassandra&psig=AOvVaw3F_3tx2VUCxOcAUVOJduzB&ust=1757619588665000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCKDoqav5zo8DFQAAAAAdAAAAABAE",
+    biography: "Versión alternativa del protagonista en la saga, mercenaria y exploradora que comparte la misma historia y decisiones que Alexios."
+  },
+  {
+    name: "Aspasia",
+    category: "secondary character",
+    game: ["Assassin's Creed Odyssey"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FAspasia&psig=AOvVaw3RraTIUqH5t1vvH_irucyB&ust=1757619614907000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCLDrm7j5zo8DFQAAAAAdAAAAABAE",
+    biography: "Una figura política influyente en Atenas, vinculada a los eventos históricos y al conflicto entre familias y facciones."
+  },
+  {
+    name: "Eivor Varinsdottir",
+    category: "main character",
+    game: ["Assassin's Creed Valhalla"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Ffr%2Fwiki%2FEivor_Varinsd%25C3%25B3ttir&psig=AOvVaw0IzoI6p1f4GOxJJ_EX8fgO&ust=1757619646677000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCNiB_8b5zo8DFQAAAAAdAAAAABAK",
+    biography: "Un vikingo que lidera su clan en Inglaterra durante la era de los reinos invasores. Su historia está marcada por conquistas, alianzas y la lucha por la supervivencia."
+  },
+  {
+    name: "Sigurd Styrbjornson",
+    category: "secondary character",
+    game: ["Assassin's Creed Valhalla"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fwiki%2FSigurd_Styrbjornsson&psig=AOvVaw0mOtqB85XVE8CBjfAmcHBA&ust=1757619706268000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCLDBpeP5zo8DFQAAAAAdAAAAABAE",
+    biography: "Hermano adoptivo de Eivor y figura importante en la vida del clan, cuyas decisiones influyen en la narrativa."
+  },
+  {
+    name: "Basim Ibn Ishaq",
+    category: "main character",
+    game: ["Assassin's Creed Mirage", "Assassin's Creed Valhalla"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fen.namu.wiki%2Fw%2F%25EB%25B0%2594%25EC%258B%25AC%2520%25EC%259D%25B4%25EB%25B8%2590%2520%25EC%259D%25B4%25EC%258A%25A4%25ED%2595%2598%25ED%2581%25AC&psig=AOvVaw2HXsG78gClJI32C7b5SoOm&ust=1757619744012000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCLDvs_X5zo8DFQAAAAAdAAAAABAK",
+    biography: "Un joven Asesino en Bagdad, que busca justicia y equilibrio en una ciudad marcada por intrigas y conflictos. Su historia continúa la línea de los Asesinos en la región, mostrando su crecimiento y habilidades."
+  },
+  {
+    name: "Roshan",
+    category: "secondary character",
+    game: ["Assassin's Creed Mirage"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FRoshan&psig=AOvVaw34pLytXpK1HomNAX2XN83g&ust=1757619777314000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCPj2zIX6zo8DFQAAAAAdAAAAABAX",
+    biography: "Aliado de Basim y miembro de la Hermandad, aporta conocimiento local y apoyo en las misiones dentro de la ciudad."
+  },
+  {
+    name: "Ja'far",
+    category: "secondary character",
+    game: ["Assassin's Creed Mirage"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fwiki%2FDatabase%3A_Abu_%2527Abdallah_Muhammad_ibn_Ja%2527far&psig=AOvVaw0tolYxrUGH3cFLu5SzxbVZ&ust=1757619818560000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCJjh-Jj6zo8DFQAAAAAdAAAAABAE",
+    biography: "Un líder rival que representa los desafíos que Basim debe enfrentar en Bagdad, con influencia política y estratégica."
+  },
+  {
+    name: "Shao Jun",
+    category: "main character",
+    game: ["Assassin's Creed Chronicles: China"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FShao_Jun&psig=AOvVaw20NW-jzkfEwVLwqyZYjtkN&ust=1757619851976000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCNjesan6zo8DFQAAAAAdAAAAABAW",
+    biography: "Una joven Asesina entrenada por Ezio Auditore, que regresa a China para enfrentarse a enemigos templarios y proteger su legado."
+  },
+  {
+    name: "Tao Jun",
+    category: "secondary character",
+    game: ["Assassin's Creed Chronicles: China"],
+    img: "No hay imagenes de este personaje",
+    biography: "Aliado de Shao Jun en su misión, proporciona apoyo táctico y conocimiento del entorno."
+  },
+  {
+    name: "Jiajing Emperor",
+    category: "secondary character",
+    game: ["Assassin's Creed Chronicles: China"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fwiki%2FDatabase%3A_The_Jiajing_Emperor&psig=AOvVaw34iTKcVYeTkYN4Iz23gJHO&ust=1757620109650000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCOCjq6X7zo8DFQAAAAAdAAAAABAj",
+    biography: "El emperador durante la época de Shao Jun, cuyo reinado afecta la estabilidad política y social que la protagonista debe navegar."
+  },
+  {
+    name: "Arbaaz Mir",
+    category: "main character",
+    game: ["Assassin's Creed Chronicles: India"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FArbaaz_Mir&psig=AOvVaw0RLvFYpel8p9AkuyyPenHw&ust=1757620198836000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCLDsms77zo8DFQAAAAAdAAAAABAW",
+    biography: "Joven Asesino que debe enfrentarse a templarios en la India del Imperio Sikh, utilizando sigilo y astucia para cumplir su misión."
+  },
+  {
+    name: "Raza Soora",
+    category: "secondary character",
+    game: ["Assassin's Creed Chronicles: India"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fwiki%2FRaza_Soora&psig=AOvVaw2u5xBoCYMh1zMUhJGVSOcL&ust=1757620317329000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCMC1tov8zo8DFQAAAAAdAAAAABAL",
+    biography: "Aliado cercano de Arbaaz que aporta experiencia y apoyo en las misiones dentro del Imperio."
+  },
+  {
+    name: "Nikolai Orelov",
+    category: "main character",
+    game: ["Assassin's Creed Chronicles: Russia"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.deviantart.com%2Fgothamknight99%2Fart%2FNikolai-Andreievich-Orelov-929310204&psig=AOvVaw0pTHN4JrMfz-68c3jzqRFy&ust=1757620588595000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCKi9toj9zo8DFQAAAAAdAAAAABAK",
+    biography: "Asesino que opera en la Rusia post-revolucionaria, buscando restablecer el equilibrio y cumplir con su misión en un país turbulento."
+  },
+  {
+    name: "Anastasia",
+    category: "secondary character",
+    game: ["Assassin's Creed Chronicles: Russia"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fwiki%2FAnastasia_Nikolaevna_of_Russia&psig=AOvVaw2CL3prt2xCg_M4WMBZ90aI&ust=1757620633743000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCLCm3539zo8DFQAAAAAdAAAAABAE",
+    biography: "Aliada de Nikolai, con habilidades y conexiones que ayudan a navegar los conflictos de la época."
+  },
+  {
+    name: "Aveline de Grandpré",
+    category: "main character",
+    game: ["Assassin's Creed III: Liberation"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FAveline_de_Grandpr%25C3%25A9&psig=AOvVaw3RrafSjHalpwSgOk1ymXuX&ust=1757620667435000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCMCi9K39zo8DFQAAAAAdAAAAABAE",
+    biography: "Asesina criolla que lucha por la libertad de su gente en la Luisiana colonial, enfrentándose a injusticias sociales y templarios."
+  },
+  {
+    name: "Philippe Olivier de Grandpré",
+    category: "secondary character",
+    game: ["Assassin's Creed III: Liberation"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FPhilippe_Olivier_de_Grandpr%25C3%25A9&psig=AOvVaw0hmWQVWlWPLTvV6WmDmsRK&ust=1757620695730000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCPjelLv9zo8DFQAAAAAdAAAAABAE",
+    biography: "Padre de Aveline, cuya historia y decisiones influyen directamente en la vida de la protagonista."
+  },
+  {
+    name: "François Mackandal",
+    category: "secondary character",
+    game: ["Assassin's Creed III: Liberation"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.creativeuncut.com%2Fgallery-23%2Fac3l-mackandal.html&psig=AOvVaw1uYv4V19fevJW-8BQJJfV1&ust=1757620984349000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCMChss7-zo8DFQAAAAAdAAAAABAE",
+    biography: "Un líder rebelde cuya lucha por la libertad inspira y apoya a Aveline en su misión."
+  },
+  {
+    name: "Adéwalé",
+    category: "main character",
+    game: ["Assassin's Creed Freedom Cry", "Assassin's Creed IV: Black Flag"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreedcenter.wordpress.com%2Fvideojuegos%2Fassassins-creed-4-black-flag%2Fgrito-de-libertad%2Fadewale%2F&psig=AOvVaw1FZ22IYiLXJkHjqCfq7m07&ust=1757621051229000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCOiL4uT-zo8DFQAAAAAdAAAAABAK",
+    biography: "Ex-esclavo convertido en Asesino, lucha por liberar a los oprimidos en el Caribe mientras expande la influencia de la Hermandad."
+  },
+  {
+    name: "Augustin",
+    category: "secondary character",
+    game: ["Assassin's Creed Freedom Cry"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fwiki%2FAugustin_Dieufort&psig=AOvVaw2HneWbWtafCX6KaCyicV9c&ust=1757621086623000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCICS1PX-zo8DFQAAAAAdAAAAABAE",
+    biography: "Aliado de Adéwalé que proporciona información y apoyo estratégico en sus misiones contra los templarios."
+  },
+  {
+    name: "Fujibayashi Naoe",
+    category: "main character",
+    game: ["Assassin's Creed Shadows"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fwiki%2FFujibayashi_Naoe&psig=AOvVaw1yLkktpYH39CCTaHmTxis5&ust=1757621531716000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCIju4cmAz48DFQAAAAAdAAAAABAE",
+    biography: "Kunoichi (shinobi) originaria de la provincia de Iga, entrenada por su familia en técnicas furtivas. En Shadows es una de las dos protagonistas jugables; su estilo se centra en la velocidad, el sigilo y el uso de herramientas propias de los shinobi."
+  },
+  {
+    name: "Oda Nobunaga",
+    category: "secondary character",
+    game: ["Assassin's Creed Shadows"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fwiki%2FOda_Nobunaga&psig=AOvVaw3OaMHn6ihwm2LxxERRL3iy&ust=1757621570159000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCJj-k9yAz48DFQAAAAAdAAAAABAE",
+    biography: "Daimyō histórico cuya ambición por unificar Japón y sus campañas militares son un eje importante del trasfondo del juego. En Shadows aparece como una figura de poder cuya presencia afecta a los protagonistas y al conflicto en la región."
+  },
+  {
+    name: "Maria Thorpe",
+    category: "secondary character",
+    game: ["Assassin's Creed: Bloodlines"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FMar%25C3%25ADa_Thorpe&psig=AOvVaw0zpzpw0FmN-jU3wG9LL4ZS&ust=1757621605291000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCOCz8eyAz48DFQAAAAAdAAAAABAW",
+    biography: "Aliada y enlace de los Asesinos, cuya experiencia y astucia ayudan en la lucha contra los templarios en la isla."
+  },
+  {
+    name: "Abu'l Nuqoud",
+    category: "secondary character",
+    game: ["Assassin's Creed: Bloodlines"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FAbu%2527l_Nuqoud&psig=AOvVaw3Qn6R4IkmXBGn_TxH4Fdih&ust=1757621665070000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCND45omBz48DFQAAAAAdAAAAABAE",
+    biography: "Un adversario templario que representa los desafíos y la corrupción presentes en Chipre."
+  },
+  {
+    name: "Garnier de Naplouse",
+    category: "secondary character",
+    game: ["Assassin's Creed: Altair's Chronicles"],
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FGarnier_de_Naplouse&psig=AOvVaw1ukEpno7RdzczR-_uIR2S2&ust=1757621698782000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCLj3uZmBz48DFQAAAAAdAAAAABAE",
+    biography: "Aliado templario cuya interacción con Altaïr define algunos de los primeros conflictos en Tierra Santa."
+  }
+];
+
+const seedCharacters = async () => {
+  try {
+    await connectDB();
+
+    await Character.deleteMany();
+    console.log("Personajes borrados");
+
+    await Character.insertMany(characters);
+    console.log("Personajes creados");
+  } catch (error) {
+    console.error("Error al cargar la semilla");
+  }
+};
+
+seedCharacters();

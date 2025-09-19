@@ -1,0 +1,232 @@
+require("dotenv").config();
+const { connectDB } = require("../../config/db");
+const Game = require("../../api/models/games");
+
+const games = [
+  {
+    name: "Assassin's Creed",
+    year: 2007,
+    img: "https://upload.wikimedia.org/wikipedia/en/5/52/Assassin%27s_Creed.jpg",
+    platform: ["PlayStation 3", "Xbox 360", "PC"],
+    location: ["Damasco", "Acre", "Jerusalén", "Masyaf"],
+    synopsis: "Un juego de acción y aventura en mundo abierto que introduce la lucha entre Asesinos y Templarios en la época de las Cruzadas.",
+    mainCharacter: [],
+    secondaryCharacters: []
+  },
+    {
+    name: "Assassin's Creed: Altair's Chronicles",
+    year: 2008,
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FAssassin%2527s_Creed%3A_Alta%25C3%25AFr%2527s_Chronicles&psig=AOvVaw2HdzoBgzwofSou7Vd8_-51&ust=1757616607252000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCPiNjaDuzo8DFQAAAAAdAAAAABAE",
+    platform: ["Nintendo DS", "PSP", "iOS", "Android", "Windows Phone"],
+    location: ["Tierra Santa (Jerusalén, Alepo, Damasco, Acre, Tiro)"],
+    synopsis: "Una precuela del primer Assassin's Creed que narra una misión de Altaïr antes de los eventos principales de la saga.",
+    mainCharacter: [],
+    secondaryCharacters: []
+  },
+    {
+    name: "Assassin's Creed: Bloodlines",
+    year: 2009,
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.imdb.com%2Fes%2Ftitle%2Ftt2399780%2F&psig=AOvVaw0fMvXR_QZGwzCC5zcNzQ3N&ust=1757616680153000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCLD2icLuzo8DFQAAAAAdAAAAABAE",
+    platform: ["PSP"],
+    location: ["Chipre (Limassol, Kyrenia)"],
+    synopsis: "Un spin-off que conecta directamente con los eventos del primer Assassin's Creed, siguiendo la expansión del conflicto entre Asesinos y Templarios en la isla de Chipre.",
+    mainCharacter: [],
+    secondaryCharacters: []
+  },
+  {
+    name: "Assassin's Creed II",
+    year: 2009,
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fstore.epicgames.com%2Fes-ES%2Fp%2Fassassins-creed-2&psig=AOvVaw1yT0dP46D6beSmYD5v_h9Y&ust=1757616719682000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCPjb0dTuzo8DFQAAAAAdAAAAABAE",
+    platform: ["PlayStation 3", "Xbox 360", "PC"],
+    location: ["Florencia", "Venecia", "Toscana", "Forlí"],
+    synopsis: "La historia continúa en el Renacimiento italiano, explorando la expansión de la hermandad y el conflicto con los Templarios.",
+    mainCharacter: [],
+    secondaryCharacters: []
+  },
+  {
+    name: "Assassin's Creed: Brotherhood",
+    year: 2010,
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.ebay.es%2Fitm%2F334858984369&psig=AOvVaw0t6TAguwtwGbDwqu2XoW3v&ust=1757616765995000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCKjN5enuzo8DFQAAAAAdAAAAABAK",
+    platform: ["PlayStation 3", "Xbox 360", "PC"],
+    location: ["Roma"],
+    synopsis: "La hermandad expande su influencia en la Italia renacentista mientras lucha contra el poder templario en la capital.",
+    mainCharacter: [],
+    secondaryCharacters: []
+  },
+  {
+    name: "Assassin's Creed: Revelations",
+    year: 2011,
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fstore.ubisoft.com%2Fes%2Fassassin-s-creed--revelations%2F56c4948188a7e300458b46d2.html&psig=AOvVaw0X8pV83-iUNOUU2-GQWMkd&ust=1757616802006000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCJDa2vruzo8DFQAAAAAdAAAAABAE",
+    platform: ["PlayStation 3", "Xbox 360", "PC"],
+    location: ["Constantinopla"],
+    synopsis: "Una nueva etapa en la lucha de los Asesinos, con exploración en la ciudad otomana y el descubrimiento de secretos antiguos.",
+    mainCharacter: [],
+    secondaryCharacters: []
+  },
+  {
+    name: "Assassin's Creed III",
+    year: 2012,
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.posters.es%2Fposters%2Fassassin-s-creed-iii-cover-v18113%3Fsrsltid%3DAfmBOopXFaiPiMee3Lk9ryHwf9_3JydzqjKxHmavOUxZP9_yTdckXrPJ&psig=AOvVaw35RnweSJKm4JJTIYs1f5F1&ust=1757616831443000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCPDvyIjvzo8DFQAAAAAdAAAAABAE",
+    platform: ["PlayStation 3", "Xbox 360", "Wii U", "PC"],
+    location: ["Boston", "Nueva York", "La Frontera", "Valle Mohawk"],
+    synopsis: "Ambientado durante la Revolución Americana, el conflicto entre Asesinos y Templarios se entrelaza con los eventos históricos.",
+    mainCharacter: [],
+    secondaryCharacters: []
+  },
+    {
+    name: "Assassin's Creed III: Liberation",
+    year: 2012,
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FAssassin%2527s_Creed_III%3A_Liberation&psig=AOvVaw25B53MYb3RZYj77fYr6UjK&ust=1757616859494000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCPj5_pXvzo8DFQAAAAAdAAAAABAE",
+    platform: ["PlayStation Vita", "PC (HD remaster)", "PS3"],
+    location: ["Luisiana (Nueva Orleans, pantanos, ruinas mayas)"],
+    synopsis: "Ambientado justo antes y durante la Revolución Americana, sigue a Aveline en su lucha por independencia y justicia en una colonia francesa.",
+    mainCharacter: [],
+    secondaryCharacters: []
+  },
+  {
+    name: "Assassin's Creed IV: Black Flag",
+    year: 2013,
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fstore.ubisoft.com%2Fes%2Fassassins-creed-iv-black-flag-gold-edition%2F575ffdb4a3be1633568b4e90.html&psig=AOvVaw22Av3OXShXdjVrhjJIRZD1&ust=1757616901266000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCPjd9anvzo8DFQAAAAAdAAAAABAE",
+    platform: ["PlayStation 3", "PlayStation 4", "Xbox 360", "Xbox One", "Wii U", "PC"],
+    location: ["La Habana", "Nassau", "Kingston", "Mar Caribe"],
+    synopsis: "Un juego de mundo abierto en la era dorada de la piratería, con énfasis en la exploración naval y el conflicto de las órdenes.",
+    mainCharacter: [],
+    secondaryCharacters: []
+  },
+    {
+    name: "Assassin's Creed: Freedom Cry",
+    year: 2013,
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fstore.ubisoft.com%2Fes%2Fassassin-s-creed--freedom-cry---standalone-game%2F56c4948188a7e300458b46ce.html&psig=AOvVaw2I2IbydTWBEahEOMf93M0q&ust=1757616939108000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCODalrzvzo8DFQAAAAAdAAAAABAE",
+    platform: ["PC", "PlayStation 3/4", "Xbox 360/One", "Switch (The Rebel Collection)", "Stadia"],
+    location: ["Saint-Domingue (actual Haití), Caribe"],
+    synopsis: "Una expansión independiente de Black Flag que cuenta la historia de Adewale, un ex-esclavo convertido en Asesino que lidera una rebelión contra la esclavitud.",
+    mainCharacter: [],
+    secondaryCharacters: []
+  },
+  {
+    name: "Assassin's Creed: Rogue",
+    year: 2014,
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FAssassin%2527s_Creed%3A_Rogue&psig=AOvVaw380wSmO9GpLNMY7JdR59e_&ust=1757616975725000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCOjbw83vzo8DFQAAAAAdAAAAABAE",
+    platform: ["PlayStation 3", "Xbox 360", "PC", "PlayStation 4", "Xbox One", "Switch"],
+    location: ["Norteamérica", "Atlántico Norte", "Río de Nueva York"],
+    synopsis: "La perspectiva cambia, explorando cómo el conflicto entre Asesinos y Templarios afecta a quienes cambian de bando.",
+    mainCharacter: [],
+    secondaryCharacters: []
+  },
+  {
+    name: "Assassin's Creed: Unity",
+    year: 2014,
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.playstation.com%2Fes-es%2Fgames%2Fassassins-creed-unity%2F&psig=AOvVaw11EllV53c7Sll-3BTU47Nk&ust=1757617002641000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCJD7ptvvzo8DFQAAAAAdAAAAABAE",
+    platform: ["PlayStation 4", "Xbox One", "PC"],
+    location: ["París"],
+    synopsis: "Ambientado durante la Revolución Francesa, se centra en el cambio social y político mientras las órdenes luchan por el control.",
+    mainCharacter: [],
+    secondaryCharacters: []
+  },
+  {
+    name: "Assassin's Creed: Syndicate",
+    year: 2015,
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fstore.epicgames.com%2Fes-ES%2Fp%2Fassassins-creed-syndicate&psig=AOvVaw2MYZjxGpDKtCqBnIeel-KL&ust=1757617034425000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCOibrunvzo8DFQAAAAAdAAAAABAE",
+    platform: ["PlayStation 4", "Xbox One", "PC"],
+    location: ["Londres"],
+    synopsis: "La historia se desarrolla en plena Revolución Industrial, mostrando la lucha contra la corrupción y el dominio templario.",
+    mainCharacter: [],
+    secondaryCharacters: []
+  },
+    {
+    name: "Assassin's Creed Chronicles: China",
+    year: 2015,
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.3djuegos.com%2Fjuegos%2Fassassins-creed-chronicles-china%2F&psig=AOvVaw13KGb1yZdtjueNWJcMg_AS&ust=1757617069691000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCNjknPrvzo8DFQAAAAAdAAAAABAE",
+    platform: ["PC", "PlayStation 4", "Xbox One", "PlayStation Vita"],
+    location: ["China (época Ming)"],
+    synopsis: "Un juego en 2.5D que sigue a Shao Jun durante la turbulenta caída de la dinastía Ming, combinando sigilo y artes marciales.",
+    mainCharacter: [],
+    secondaryCharacters: []
+  },
+  {
+    name: "Assassin's Creed Chronicles: India",
+    year: 2016,
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.3djuegos.com%2Fjuegos%2Fassassins-creed-chronicles-india%2F&psig=AOvVaw10giaGMERvqQ8WOyy4kynC&ust=1757617097668000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCNDZv4fwzo8DFQAAAAAdAAAAABAE",
+    platform: ["PC", "PlayStation 4", "Xbox One", "PlayStation Vita"],
+    location: ["India (Imperio Sikh)"],
+    synopsis: "Asume el papel de Arbaaz Mir en una aventura estilizada donde el sigilo y el entorno histórico se integran con libertad táctica.",
+    mainCharacter: [],
+    secondaryCharacters: []
+  },
+  {
+    name: "Assassin's Creed Chronicles: Russia",
+    year: 2016,
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fassassinscreed.fandom.com%2Fes%2Fwiki%2FAssassin%2527s_Creed_Chronicles%3A_Russia&psig=AOvVaw2ghp8dZtHdOR2lthwFHjdn&ust=1757617127421000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCJC93ZXwzo8DFQAAAAAdAAAAABAE",
+    platform: ["PC", "PlayStation 4", "Xbox One", "PlayStation Vita"],
+    location: ["Rusia (Revolución Rusa, 1918)"],
+    synopsis: "Con Nikolaï y Anastasia, explora el conflicto tras la Revolución Rusa en una narrativa visual oscura y estratégica.",
+    mainCharacter: [],
+    secondaryCharacters: []
+  },
+  {
+    name: "Assassin's Creed: Origins",
+    year: 2017,
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fstore.epicgames.com%2Fes-ES%2Fp%2Fassassins-creed-origins&psig=AOvVaw1rlHjnMxbpABkGx9-PDoSr&ust=1757617162747000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCMDKyqbwzo8DFQAAAAAdAAAAABAE",
+    platform: ["PlayStation 4", "Xbox One", "PC"],
+    location: ["Egipto"],
+    synopsis: "Explora los orígenes de la Hermandad en el Antiguo Egipto, con un mundo abierto que revela los inicios del conflicto.",
+    mainCharacter: [],
+    secondaryCharacters: []
+  },
+  {
+    name: "Assassin's Creed: Odyssey",
+    year: 2018,
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Ferikstore.com%2Fes%2F11405-poster-gamer-assassins-creed-odyssey-one-sheet.html%3Fsrsltid%3DAfmBOoqaAI9x8Y1z5DQyxOMUXRX3rYhJsgpHfjqSI2oln1icnXpeoHrR&psig=AOvVaw1154IwlhTr4EiGj9vQiD-o&ust=1757617192170000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCMCOsbXwzo8DFQAAAAAdAAAAABAu",
+    platform: ["PlayStation 4", "Xbox One", "PC", "Stadia"],
+    location: ["Grecia"],
+    synopsis: "Ambientado en la Grecia clásica, explora la conexión entre las antiguas civilizaciones y las órdenes secretas.",
+    mainCharacter: [],
+    secondaryCharacters: []
+  },
+  {
+    name: "Assassin's Creed: Valhalla",
+    year: 2020,
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.3djuegos.com%2F36644%2Fcaratula%2Fassassins-creed-valhalla%2F&psig=AOvVaw2odGuC2o3Ka74PsRTbs8TI&ust=1757617252084000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCIjkidLwzo8DFQAAAAAdAAAAABAE",
+    platform: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "PC", "Stadia"],
+    location: ["Noruega", "Inglaterra"],
+    synopsis: "Durante la era vikinga, la expansión hacia nuevas tierras se cruza con el conflicto entre Asesinos y Templarios.",
+    mainCharacter: [],
+    secondaryCharacters: []
+  },
+  {
+    name: "Assassin's Creed: Mirage",
+    year: 2023,
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.3djuegos.com%2Fjuegos%2Fassassins-creed-mirage%2Fcaratula%2F&psig=AOvVaw0tlcPrnGzBU3Y4ZA5OC0fg&ust=1757617281344000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCPDgud_wzo8DFQAAAAAdAAAAABAE",
+    platform: ["PlayStation 4", "PlayStation 5", "Xbox One", "Xbox Series X/S", "PC"],
+    location: ["Bagdad"],
+    synopsis: "Un regreso a los orígenes de la saga, centrado en la infiltración y el sigilo dentro de una ciudad vibrante.",
+    mainCharacter: [],
+    secondaryCharacters: []
+  },
+  {
+    name: "Assassin's Creed: Shadows",
+    year: 2025,
+    img: "https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.3djuegos.com%2Fjuegos%2Fassassins-creed-shadows%2Fcaratula%2F&psig=AOvVaw2niu76EiExGHQ6cFnsRaxr&ust=1757617318681000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCJjU9fDwzo8DFQAAAAAdAAAAABAE",
+    platform: ["Windows", "macOS", "PlayStation 5", "Xbox Series X/S"],
+    location: ["Japón feudal (período Sengoku): Osaka, Kioto, Nara, Kamakura"],
+    synopsis: "Ambientado en el Japón del siglo XVI, combina sigilo, exploración y combate en un mundo abierto con dos protagonistas jugables.",
+    mainCharacter: [],
+    secondaryCharacters: []
+  }
+];
+
+const seedGames = async () => {
+  try {
+    await connectDB();
+
+    await Game.deleteMany();
+    console.log("Juegos borrados");
+
+    await Game.insertMany(games);
+    console.log("Juegos creados");
+  } catch (error) {
+    console.error("Error al cargar la semilla");
+  }
+};
+
+seedGames();
