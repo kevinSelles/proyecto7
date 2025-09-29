@@ -7,7 +7,9 @@ const getGames = async (req, res, next) => {
     .populate("secondaryCharacters");
     return res.status(200).json(games);
   } catch (error) {
-    return res.status(400).json("Aquí debería de haber juegos... ¡No sé qué ha pasado!");
+    return res.status(400).json({
+      message: "Aquí debería de haber juegos... ¡No sé qué ha pasado!",
+      error: error.message});
   }
 };
 const getGameById = async (req, res, next) => {
@@ -18,7 +20,9 @@ const getGameById = async (req, res, next) => {
     .populate("secondaryCharacters");
     return res.status(200).json(game);
   } catch (error) {
-    return res.status(400).json("Seguro que lo tengo justo delante, pero por mucho que miro, no lo encuentro.");
+    return res.status(400).json({
+      message: "Seguro que lo tengo justo delante, pero por mucho que miro, no lo encuentro.",
+      error: error.message});
   }
 };
 const getGamesByYear = async (req, res, next) => {
@@ -34,7 +38,9 @@ const getGamesByYear = async (req, res, next) => {
 
     return res.status(200).json(games);
   } catch (error) {
-    return res.status(400).json("Con estas cosas tan antiguas cuesta acordarse, prueba de nuevo.");
+    return res.status(400).json({
+      message: "Con estas cosas tan antiguas cuesta acordarse, prueba de nuevo.",
+      error: error.message});
   }
 };
 const postGame = async (req, res, next) => {
@@ -43,7 +49,9 @@ const postGame = async (req, res, next) => {
     const gameSaved = await newGame.save();
     return res.status(201).json(gameSaved);
   } catch (error) {
-    return res.status(400).json("Me vas a matar pero... No consigo publicar tu juego. Tanto trabajo para nada.");
+    return res.status(400).json({
+      message: "Me vas a matar pero... No consigo publicar tu juego. Tanto trabajo para nada.",
+      error: error.message});
   }
 };
 const putGame = async (req, res, next) => {
@@ -59,7 +67,9 @@ const putGame = async (req, res, next) => {
     const gameUpdated = await Game.findByIdAndUpdate(id, newGame, {new: true,});
     return res.status(200).json(gameUpdated);
   } catch (error) {
-    return res.status(400).json("El becario que hizo la web debió configurar algo mal, porque no consigo modificar el juego.");
+    return res.status(400).json({
+      message: "El becario que hizo la web debió configurar algo mal, porque no consigo modificar el juego.",
+      error: error.message});
   }
 };
 const deleteGame = async (req, res, next) => {
@@ -68,7 +78,9 @@ const deleteGame = async (req, res, next) => {
     const gameDeleted = await Game.findByIdAndDelete(id);
     return res.status(200).json(gameDeleted);
   } catch (error) {
-    return res.status(400).json("Pues si que está bien pegado este juego a la web, no consigo quitarlo.");
+    return res.status(400).json({
+      message: "Pues si que está bien pegado este juego a la web, no consigo quitarlo.",
+      error: error.message});
   }
 };
 

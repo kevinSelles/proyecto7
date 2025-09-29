@@ -11,6 +11,21 @@ const getUsers = async (req, res, next) => {
   }
 }
 
+const getUserById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json("Usuario no encontrado");
+    }
+
+    return res.status(200).json(user);
+  } catch (error) {
+    return res.status(400).json(error);
+  }
+};
+
 const postUser = async (req, res, next) => {
   try {
     const newUser = new User(req.body);
@@ -56,7 +71,7 @@ const putUser = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    if(req.user._id.toString() !== id && req.user.rol !== "amin") {
+    if(req.user._id.toString() !== id && req.user.rol !== "admin") {
       return res.status(400).json("Por favor, no molestes a otros usuarios.");
     }
 
@@ -70,7 +85,9 @@ const putUser = async (req, res, next) => {
     const userUpdated = await User.findByIdAndUpdate(id, newUser, {new: true,});
     return res.status(200).json(userUpdated);
   } catch (error) {
-    return res.status(400).json("El usuario se resiste a ser modificado");
+    return res.status(400).json({
+      message: "El usuario se resiste a ser modificado",
+      error: error.message});
   }
 };
 
@@ -78,15 +95,17 @@ const deleteUser = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    if(req.user._id.toString() !== id && req.user.rol !== "amin") {
+    if(req.user._id.toString() !== id && req.user.rol !== "admin") {
     return res.status(403).json("Borrar a otros usuarios sin su permiso está feo, consúltalo con un administrador");
     }
 
     const userDeleted = await User.findByIdAndDelete(id);
     return res.status(200).json(userDeleted);
   } catch (error) {
-    return res.status(400).json("El usuario es más poderoso que el sistema, algo falla.");
+    return res.status(400).json({
+      message: "El usuario es más poderoso que el sistema, algo falla.",
+      error: error.message});
   }
 }
 
-module.exports = { getUsers, postUser, login, deleteUser, putUser };
+module.exports = { getUsers, getUserById, postUser, login, deleteUser, putUser };

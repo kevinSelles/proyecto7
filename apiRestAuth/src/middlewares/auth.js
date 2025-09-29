@@ -13,7 +13,9 @@ const auth = async (req, res, next) => {
     
     next()
   } catch (error) {
-    return res.status(400).json("Nooo!... Puedes!... Pasar!  By Gandalf");
+    return res.status(400).json({
+      message: "Nooo!... Puedes!... Pasar!  By Gandalf",
+      error: error.message});
   }
 }
 
@@ -34,7 +36,9 @@ const adminAuth = async (req, res, next) => {
     }
     
   } catch (error) {
-    return res.status(400).json("Nooo!... Puedes!... Pasar!  By Gandalf");
+    return res.status(400).json({
+      message: "Nooo!... Puedes!... Pasar!  By Gandalf",
+      error: error.message});
   }
 }
 
