@@ -7,13 +7,12 @@ const auth = async (req, res, next) => {
     const parsedToken = token.replace("Bearer ", "");
     
     const { id } = verifyToken(parsedToken);
-    const user = await User.findById(id);
-    user.password =null;
+    const user = await User.findById(id).select("-password");
     req.user = user;
     
     next()
   } catch (error) {
-    return res.status(400).json({
+    return res.status(401).json({
       message: "Nooo!... Puedes!... Pasar!  By Gandalf",
       error: error.message});
   }
@@ -32,11 +31,11 @@ const adminAuth = async (req, res, next) => {
       req.user = user;
       next()
     } else {
-      return res.status(400).json("No tienes poder aquí, pero puedes consultarle a un administrador");
+      return res.status(403).json("No tienes poder aquí, pero puedes consultarle a un administrador");
     }
     
   } catch (error) {
-    return res.status(400).json({
+    return res.status(401).json({
       message: "Nooo!... Puedes!... Pasar!  By Gandalf",
       error: error.message});
   }

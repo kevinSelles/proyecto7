@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const characterSchema = new mongoose.Schema({
     name: {type: String, required: true},
     category: {type: String, required: true},
-    game: {type: [String], require: true},
+    game: {type: [String], required: true},
     img: {type: String, required: true},
     biography: {type: String, required: true}
 }, {

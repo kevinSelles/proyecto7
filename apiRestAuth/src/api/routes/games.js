@@ -1,6 +1,5 @@
 const { adminAuth } = require("../../middlewares/auth");
 const { getGames, getGameById, getGamesByYear, postGame, putGame, deleteGame } = require("../controllers/games");
-adminAuth
 const gamesRouter = require("express").Router();
 
 gamesRouter.get("/year/:year", getGamesByYear);
